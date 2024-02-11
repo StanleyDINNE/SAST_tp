@@ -1,0 +1,8 @@
+{
+	"explorer.sortOrder": "type",
+	"[typst]": {
+		"editor.insertSpaces": false,
+		"editor.tabSize": 4
+	},
+	// "typst-lsp.rootPath": "/",
+}
