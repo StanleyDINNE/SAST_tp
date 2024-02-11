@@ -85,7 +85,7 @@ En relançant l'analyse, on obtient bien les même résultats que lors des premi
 
 = SEMGREP
 
-== Premier usage usage de SEMGREP
+== Premier usage de SEMGREP sur des exemples
 
 === Installation et configuration de SEMGREP
 
@@ -184,7 +184,7 @@ En relançant le scan, on obtient un écran satisfaisant sans vulnérabilité Hi
 #pagebreak()
 
 
-=== Dossier #file_folder("2/")
+=== Dossier #file_folder("2/") <ex2_2>
 
 ```bash cd ../2 && semgrep ci```
 
@@ -243,3 +243,24 @@ Mais c'était un peu trop long à setup dans l'interface en ligne, alors on a eu
 
 
 #pagebreak()
+
+
+=== Dossier #file_folder("3/")
+
+```bash cd ../3 && semgrep ci```
+
+==== Problèmes détectés
+
+#insert_figure("Vulnérabilités trouvées dans le dossier 3")
+
+==== Corrections
+
+Pour `raw-html-format`, il ne faut pas renvoyer de html directement : ```js res.send('Hello :' + name);``` plutôt que ```js res.send('<h1> Hello :'+ name +"</h1>")```, ou alors utiliser DOMPurify.
+
+Pour `direct-response-write`, on peut sanitiser avec ```js const xss = require("xss");``` puis ```js xss(name)``` comme l'exercice précédent (@ex2_2).
+
+Pour `taint-unsafe-echo-tag`, on peut utiliser `htmlentities` ou `htmlspecialchars` de PHP pour sanitiser.
+Le seul endroit où ça ne fonctionnerait pas, ce serait si le php était invoqué dans un contexte ```html <script> </script>``` dans lequel on pourrait appeler des fonctions et ainsi invoquer du code sans avoir besoin de charactères tels que `"`, `'`, `<`, `>`, etc. Mais là ce n'est que du php donc ça va, `htmlentities` fera l'affaire.
+
+#insert_figure("Alerts gone..")
+
