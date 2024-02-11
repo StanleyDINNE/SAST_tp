@@ -1,0 +1,560 @@
+Run started:2024-02-11 14:38:15.865357
+
+Test results:
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:12:0
+11	
+12	User.objects.filter(username='admin').extra(dict(could_be='insecure'))
+13	User.objects.filter(username='admin').extra(select=dict(could_be='insecure'))
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:13:0
+12	User.objects.filter(username='admin').extra(dict(could_be='insecure'))
+13	User.objects.filter(username='admin').extra(select=dict(could_be='insecure'))
+14	query = '"username") AS "username", * FROM "auth_user" WHERE 1=1 OR "username"=? --'
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:15:0
+14	query = '"username") AS "username", * FROM "auth_user" WHERE 1=1 OR "username"=? --'
+15	User.objects.filter(username='admin').extra(select={'test': query})
+16	User.objects.filter(username='admin').extra(select={'test': '%secure' % 'nos'})
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:16:0
+15	User.objects.filter(username='admin').extra(select={'test': query})
+16	User.objects.filter(username='admin').extra(select={'test': '%secure' % 'nos'})
+17	User.objects.filter(username='admin').extra(select={'test': '{}secure'.format('nos')})
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:17:0
+16	User.objects.filter(username='admin').extra(select={'test': '%secure' % 'nos'})
+17	User.objects.filter(username='admin').extra(select={'test': '{}secure'.format('nos')})
+18	
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:20:0
+19	where_var = ['1=1) OR 1=1 AND (1=1']
+20	User.objects.filter(username='admin').extra(where=where_var)
+21	where_str = '1=1) OR 1=1 AND (1=1'
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:22:0
+21	where_str = '1=1) OR 1=1 AND (1=1'
+22	User.objects.filter(username='admin').extra(where=[where_str])
+23	User.objects.filter(username='admin').extra(where=['%secure' % 'nos'])
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:23:0
+22	User.objects.filter(username='admin').extra(where=[where_str])
+23	User.objects.filter(username='admin').extra(where=['%secure' % 'nos'])
+24	User.objects.filter(username='admin').extra(where=['{}secure'.format('no')])
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:24:0
+23	User.objects.filter(username='admin').extra(where=['%secure' % 'nos'])
+24	User.objects.filter(username='admin').extra(where=['{}secure'.format('no')])
+25	
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:27:0
+26	tables_var = ['django_content_type" WHERE "auth_user"."username"="admin']
+27	User.objects.all().extra(tables=tables_var).distinct()
+28	tables_str = 'django_content_type" WHERE "auth_user"."username"="admin'
+
+--------------------------------------------------
+>> Issue: [B610:django_extra_used] Use of extra potential SQL attack vector.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b610_django_extra_used.html
+   Location: ./1.py:29:0
+28	tables_str = 'django_content_type" WHERE "auth_user"."username"="admin'
+29	User.objects.all().extra(tables=[tables_str]).distinct()
+
+--------------------------------------------------
+>> Issue: [B102:exec_used] Use of exec detected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b102_exec_used.html
+   Location: ./2.py:1:0
+1	exec("pas bien")
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'class_password'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:4:15
+3	class SomeClass:
+4	    password = "class_password"
+5	
+
+--------------------------------------------------
+>> Issue: [B107:hardcoded_password_default] Possible hardcoded password: 'Admin'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b107_hardcoded_password_default.html
+   Location: ./3.py:8:0
+7	# Severity: Low   Confidence: Medium
+8	def someFunction(user, password="Admin"):
+9	    print("Hi " + user)
+10	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'root'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:14:19
+13	    # Severity: Low   Confidence: Medium
+14	    if password == "root":
+15	        print("OK, logged in")
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: ''
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:20:19
+19	    # Severity: Low   Confidence: Medium
+20	    if password == '':
+21	        print("No password!")
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'ajklawejrkl42348swfgkg'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:26:19
+25	    # Severity: Low   Confidence: Medium
+26	    if password == "ajklawejrkl42348swfgkg":
+27	        print("Nice password!")
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'this cool password'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:33:23
+32	    # Severity: Low   Confidence: Medium
+33	    if obj.password == "this cool password":
+34	        print(obj.password)
+
+--------------------------------------------------
+>> Issue: [B107:hardcoded_password_default] Possible hardcoded password: 'blerg'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b107_hardcoded_password_default.html
+   Location: ./3.py:38:0
+37	# Severity: Low   Confidence: Medium
+38	def doLogin(password="blerg"):
+39	    pass
+40	
+
+--------------------------------------------------
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'blerg'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b106_hardcoded_password_funcarg.html
+   Location: ./3.py:46:0
+45	# Severity: Low   Confidence: Medium
+46	doLogin(password="blerg")
+47	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'blerg'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:50:11
+49	# Severity: Low   Confidence: Medium
+50	password = "blerg"
+51	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'blerg'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:54:2
+53	# Severity: Low   Confidence: Medium
+54	d["password"] = "blerg"
+55	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'secret'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:58:17
+57	# Severity: Low   Confidence: Medium
+58	EMAIL_PASSWORD = "secret"
+59	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'emails_secret'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:62:12
+61	# Severity: Low   Confidence: Medium
+62	email_pwd = 'emails_secret'
+63	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'd6s$f9g!j8mg7hw?n&2'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:66:31
+65	# Severity: Low   Confidence: Medium
+66	my_secret_password_for_email = 'd6s$f9g!j8mg7hw?n&2'
+67	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: '1234'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
+   Location: ./3.py:70:11
+69	# Severity: Low   Confidence: Medium
+70	passphrase='1234'
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: ./4.py:9:4
+8	    # Python 3
+9	    urllib.request.urlopen('file:///bin/ls')
+10	    urllib.request.urlretrieve('file:///bin/ls', '/bin/ls2')
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: ./4.py:10:4
+9	    urllib.request.urlopen('file:///bin/ls')
+10	    urllib.request.urlretrieve('file:///bin/ls', '/bin/ls2')
+11	    opener = urllib.request.URLopener()
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: ./4.py:11:13
+10	    urllib.request.urlretrieve('file:///bin/ls', '/bin/ls2')
+11	    opener = urllib.request.URLopener()
+12	    opener.open('file:///bin/ls')
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: ./4.py:14:13
+13	    opener.retrieve('file:///bin/ls')
+14	    opener = urllib.request.FancyURLopener()
+15	    opener.open('file:///bin/ls')
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: ./4.py:19:4
+18	    # Six
+19	    six.moves.urllib.request.urlopen('file:///bin/ls')
+20	    six.moves.urllib.request.urlretrieve('file:///bin/ls', '/bin/ls2')
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: ./4.py:20:4
+19	    six.moves.urllib.request.urlopen('file:///bin/ls')
+20	    six.moves.urllib.request.urlretrieve('file:///bin/ls', '/bin/ls2')
+21	    opener = six.moves.urllib.request.URLopener()
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: ./4.py:21:13
+20	    six.moves.urllib.request.urlretrieve('file:///bin/ls', '/bin/ls2')
+21	    opener = six.moves.urllib.request.URLopener()
+22	    opener.open('file:///bin/ls')
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: ./4.py:24:13
+23	    opener.retrieve('file:///bin/ls')
+24	    opener = six.moves.urllib.request.FancyURLopener()
+25	    opener.open('file:///bin/ls')
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:4:8
+3	# bad
+4	query = "SELECT * FROM foo WHERE id = '%s'" % identifier
+5	query = "INSERT INTO foo VALUES ('a', 'b', '%s')" % value
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:5:8
+4	query = "SELECT * FROM foo WHERE id = '%s'" % identifier
+5	query = "INSERT INTO foo VALUES ('a', 'b', '%s')" % value
+6	query = "DELETE FROM foo WHERE id = '%s'" % identifier
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:6:8
+5	query = "INSERT INTO foo VALUES ('a', 'b', '%s')" % value
+6	query = "DELETE FROM foo WHERE id = '%s'" % identifier
+7	query = "UPDATE foo SET value = 'b' WHERE id = '%s'" % identifier
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:7:8
+6	query = "DELETE FROM foo WHERE id = '%s'" % identifier
+7	query = "UPDATE foo SET value = 'b' WHERE id = '%s'" % identifier
+8	query = """WITH cte AS (SELECT x FROM foo)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:8:8
+7	query = "UPDATE foo SET value = 'b' WHERE id = '%s'" % identifier
+8	query = """WITH cte AS (SELECT x FROM foo)
+9	SELECT x FROM cte WHERE x = '%s'""" % identifier
+10	# bad alternate forms
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:11:8
+10	# bad alternate forms
+11	query = "SELECT * FROM foo WHERE id = '" + identifier + "'"
+12	query = "SELECT * FROM foo WHERE id = '{}'".format(identifier)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:12:8
+11	query = "SELECT * FROM foo WHERE id = '" + identifier + "'"
+12	query = "SELECT * FROM foo WHERE id = '{}'".format(identifier)
+13	query = "SELECT * FROM foo WHERE id = '[VALUE]'".replace("[VALUE]", identifier)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:13:8
+12	query = "SELECT * FROM foo WHERE id = '{}'".format(identifier)
+13	query = "SELECT * FROM foo WHERE id = '[VALUE]'".replace("[VALUE]", identifier)
+14	
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:16:12
+15	# bad
+16	cur.execute("SELECT * FROM foo WHERE id = '%s'" % identifier)
+17	cur.execute("INSERT INTO foo VALUES ('a', 'b', '%s')" % value)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:17:12
+16	cur.execute("SELECT * FROM foo WHERE id = '%s'" % identifier)
+17	cur.execute("INSERT INTO foo VALUES ('a', 'b', '%s')" % value)
+18	cur.execute("DELETE FROM foo WHERE id = '%s'" % identifier)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:18:12
+17	cur.execute("INSERT INTO foo VALUES ('a', 'b', '%s')" % value)
+18	cur.execute("DELETE FROM foo WHERE id = '%s'" % identifier)
+19	cur.execute("UPDATE foo SET value = 'b' WHERE id = '%s'" % identifier)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:19:12
+18	cur.execute("DELETE FROM foo WHERE id = '%s'" % identifier)
+19	cur.execute("UPDATE foo SET value = 'b' WHERE id = '%s'" % identifier)
+20	# bad alternate forms
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:21:12
+20	# bad alternate forms
+21	cur.execute("SELECT * FROM foo WHERE id = '" + identifier + "'")
+22	cur.execute("SELECT * FROM foo WHERE id = '{}'".format(identifier))
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:22:12
+21	cur.execute("SELECT * FROM foo WHERE id = '" + identifier + "'")
+22	cur.execute("SELECT * FROM foo WHERE id = '{}'".format(identifier))
+23	cur.execute("SELECT * FROM foo WHERE id = '[VALUE]'".replace("[VALUE]", identifier))
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:23:12
+22	cur.execute("SELECT * FROM foo WHERE id = '{}'".format(identifier))
+23	cur.execute("SELECT * FROM foo WHERE id = '[VALUE]'".replace("[VALUE]", identifier))
+24	
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:26:12
+25	# bad f-strings
+26	cur.execute(f"SELECT {column_name} FROM foo WHERE id = 1")
+27	cur.execute(f"SELECT {a + b} FROM foo WHERE id = 1")
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:27:12
+26	cur.execute(f"SELECT {column_name} FROM foo WHERE id = 1")
+27	cur.execute(f"SELECT {a + b} FROM foo WHERE id = 1")
+28	cur.execute(f"INSERT INTO {table_name} VALUES (1)")
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:28:12
+27	cur.execute(f"SELECT {a + b} FROM foo WHERE id = 1")
+28	cur.execute(f"INSERT INTO {table_name} VALUES (1)")
+29	cur.execute(f"UPDATE {table_name} SET id = 1")
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:29:12
+28	cur.execute(f"INSERT INTO {table_name} VALUES (1)")
+29	cur.execute(f"UPDATE {table_name} SET id = 1")
+30	
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./5.py:43:4
+42	
+43	a()("SELECT %s FROM foo" % val)
+44	
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 105
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 14
+		Medium: 40
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 10
+		Medium: 35
+		High: 9
+Files skipped (0):
