@@ -8,7 +8,6 @@
 	author: (
 		reb: __constants_toml.author.reb,
 		stan: __constants_toml.author.stan,
-		raf: __constants_toml.author.raf,
 	)
 )
 

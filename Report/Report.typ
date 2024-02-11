@@ -182,3 +182,64 @@ En relançant le scan, on obtient un écran satisfaisant sans vulnérabilité Hi
 #insert_figure("Interface Web de Semgrep avec le rappel des vulnérabilités, dorénavant corrigées", width: 30%)
 
 #pagebreak()
+
+
+=== Dossier #file_folder("2/")
+
+```bash cd ../2 && semgrep ci```
+
+==== Problèmes détectés
+
+#insert_figure("Toujours plus de vulnérabilités dans un si petit script")
+
+==== Corrections
+
+On peut sanitiser l'input avec les solutons données dans la page d'aide, à savoir importer le module `xss` :
+#insert_code-snippet(title: "Sanitizer HTML proposé par Semgrep")[```js
+var xss = require("xss");
+...
+res.send('<h1> Hello :' + xss(a) + "</h1>");
+```]
+
+
+Pour protéger contre ReDoS (Regular Expression Denial of Service), il faut simplifier le pattern de la regex, pour éviter que la recherche soit exessivement longue si l'input est conçu pour faire câbler une Regex.
+Dans notre cas, on peut utiliser ```js var r = /^[a-z]+$/;``` à la place de ```js var r = /^([a-z]+)+$/;```.
+
+
+#insert_figure("Les résultats qui font plaisir", width: 50%)
+
+#pagebreak()
+
+==== Correction alternative pour sanitiser le direct-input
+
+Ou alors on peut créer notre propre sanitizer, en utilisant une regex qui va attraper tous les caractères suspicieux et renvoyer leur équivalent sanitisé depuis un mapping issu d'un dictionnaire :
+#insert_code-snippet(title: "Sanitizer HTML fait-maison")[```js
+const escapeHTML = str => str.replace(/[&<>'"]/g, tag => ({
+	'&': '&amp;',
+	'<': '&lt;',
+	'>': '&gt;',
+	"'": '&#39;',
+	'"': '&quot;',
+}[tag]));
+```]
+
+Mais si on fait ça, il faut l'ajouter dans les règles de Semgrep, pour qu'il le reconnaisse comme un sanitizer avec quelque chose comme
+#insert_code-snippet(title: "Règles à ajouter pour Semgrep")[```yaml
+pattern-sanitizers:
+  - patterns:
+      - pattern-either:
+          - pattern-inside: |
+              const escapeHTML = $P => $P.replace(/[&<>'"]/g, $I => ({
+                  '&': '&amp;',
+                  '<': '&lt;',
+                  '>': '&gt;',
+                  "'": '&#39;',
+                  '"': '&quot;',
+              }[$I]));
+              ...
+      - pattern: escapeHTML(...)
+```]
+Mais c'était un peu trop long à setup dans l'interface en ligne, alors on a eu recourt aux propositions, telles que ```js require('xss')```.
+
+
+#pagebreak()

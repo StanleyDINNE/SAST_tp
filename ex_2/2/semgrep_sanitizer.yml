@@ -1,0 +1,13 @@
+pattern-sanitizers:
+  - patterns:
+      - pattern-either:
+          - pattern-inside: |
+              const escapeHTML = $P => $P.replace(/[&<>'"]/g, $I => ({
+                  '&': '&amp;',
+                  '<': '&lt;',
+                  '>': '&gt;',
+                  "'": '&#39;',
+                  '"': '&quot;',
+              }[$I]));
+              ...
+      - pattern: escapeHTML(...)
