@@ -1,5 +1,5 @@
 ### Bandit config file generated from:
-# './SAST_doc/ex_1/.venv/bin/bandit-config-generator -o bandit.cfg.yml'
+# './SAST_tp/ex_1/.venv/bin/bandit-config-generator -o bandit.cfg.yml'
 
 ### This config may optionally select a subset of tests to run or skip by
 ### filling out the 'tests' and 'skips' lists given below. If no tests are

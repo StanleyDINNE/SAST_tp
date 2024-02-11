@@ -81,3 +81,104 @@ tests: [B608, B610, B102, B105, B106, B107, B310]
 En relançant l'analyse, on obtient bien les même résultats que lors des premières analyses sans configuration
 
 #pagebreak()
+
+
+= SEMGREP
+
+== Premier usage usage de SEMGREP
+
+=== Installation et configuration de SEMGREP
+
+Depuis l'exercice précédent (@bandit), on change d'environnement :
+
+#insert_code-snippet(title: [Installation de `SEMGREP`])[```bash
+deactivate # Depuis l'autre Virtual Environment pour l'exerice 1
+cd ../ex_2 && python3 -m venv .venv && source ./.venv/bin/activate
+python3 -m pip install semgrep
+python3 -m pip freeze > requirements.txt
+semgrep --version # 1.60.1
+```]
+```bash semgrep scan --config auto``` avait donné "_```text Missed out on 656 pro rules since you aren't logged in!```_", donc nous nous sommes résolus à nous créer un compte et nous connecter avec\ ```bash semgrep login```. // 💎
+
+Suite au login depuis le terminal :
++ Liaison avec _GitHub_ #insert_figure("Liaison de Semgrep avec GitHub", width: 60%)
++ Création d'une organisation "`security_3.0_static_analysis`"
++ Token de connexion est renvoyé dans le terminal
+
+
+Nous allons #link("https://semgrep.dev/orgs/-/setup/local")[analyser le code localement], tout en étant connecté à Semgrep depuis le terminal.
+
+
+
+#linebreak()
+
+
+Pour chacun des dossiers #range(1, 4+1).map(n => file_folder(to_string([#n/]))).join(", ", last: " et "), nous allons :
++ Réaliser un scan complet avec `SEMGREP`
++ Identifier les vulnérabilités de sévérité `HIGH`
++ Corriger ces vulnérabilités
++ Vérifier que ces vulnérabilités n'apparaissent plus en refaisant un scan
+
+#pagebreak()
+
+
+
+=== Dossier #file_folder("1/")
+
+```bash cd 1 && semgrep ci```
+
+==== Problèmes détectés
+
+#insert_figure("Problèmes trouvés par Semgrep dans le répertoire 1", width: 80%)
+
+- #file_folder("XmlReader_Tests.cs")
+	- `25┆ XmlReader reader = XmlReader.Create(stream, settings);`
+		- `csharp.dotnet-core.xxe.xml-dtd-allowed.xml-dtd-allowed`
+- #file_folder("test.php")
+	- `12┆ $document->loadXML($xml, LIBXML_NOENT | LIBXML_DTDLOAD);`
+		- `php.lang.security.xml-external-entities-unsafe-entity-loader.xml-external-entities-unsafe-entity-loader`
+		- `php.lang.security.xml-external-entities-unsafe-parser-flags.xml-external-entities-unsafe-parser-flags`
+		- `php.laravel.security.laravel-unsafe-entity-loader.laravel-unsafe-entity-loader`
+		- `php.laravel.security.laravel-xml-unsafe-parser-flags.laravel-xml-unsafe-parser-flags`
+
+On va essayer de corriger toutes les vulnérabilités trouvées par ce scan par défaut, c'est-à-dire Medium et High.
+
+Il se trouve que si on se rend sur les details d'une vulnérabilité dans l'interface Semgrep, et qu'on clique sur le bouton ci-dessous, on peut trouver des exemples de soltions.
+
+#insert_figure("Bouton d'exemples de solutions à appliquer", width: 30%)
+
+#pagebreak()
+
+==== Corrections
+
+Pour #file_folder("XmlReader_Tests.cs"), la configuration de Semgrep est telle qu'elle reconnait :
+#align(center, table(columns: 3,
+	..([], [_source_], [_sink_]),
+	..([1], [```cs $X.DtdProcessing = DtdProcessing.Parse```], [```cs XmlReader.Create($C, $SETTINGS, ...)```]),
+	..([2], [```cs $X.XmlResolver = new XmlUrlResolver()```], [```cs (XmlTextReader $R).$READ(...)```]),
+))
+L'idée serait de désactiver le traitement DTD et le XMLResolver ainsi :
+#insert_code-snippet(title: [Correction pour #file_folder("XmlReader_Tests.cs")])[```cs
+settings.DtdProcessing = DtdProcessing.Prohibit; // Désactiver le traitement DTD
+settings.XmlResolver = null; // Désactiver XmlResolver
+...
+xmlDocument.XmlResolver = null; // Ici aussi
+```]
+
+#linebreak()
+
+Pour #file_folder("test.php"), la vulnérabilité XXE vient de l'utilisation de ```php libxml_disable_entity_ loader(false)```.
+Pour corriger le problème, on peut modifier ```php libxml_disable_entity_loader(true)```, et ajouter ```php libxml_set_external_entity_loader(static function () { return null; });```.
+
+Bizarrement, #file_folder("test2.php") n'a pas été détecté, mais il faut aussi updater de la même façon que pour #file_folder("test.php").
+
+En relançant le scan, on obtient un écran satisfaisant sans vulnérabilité High ni Medium trouvée :
+
+#grid(columns: 2,
+	insert_figure("Toutes les vulnérabilités précédemment trouvées ont été corrigées", width: 90%),
+	insert_figure("Récapitulatif de Semgrep en ligne de commande qui indique que tout a été corrigé", width: 90%),
+)
+
+#insert_figure("Interface Web de Semgrep avec le rappel des vulnérabilités, dorénavant corrigées", width: 30%)
+
+#pagebreak()
