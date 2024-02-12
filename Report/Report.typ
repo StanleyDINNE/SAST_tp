@@ -1,5 +1,5 @@
 #import "Templates_copy_to_delete/Template_default.typ": set_config
-#import "Templates_copy_to_delete/Constants.typ": document_data
+#import "Templates_copy_to_delete/Constants.typ": document_data, line_separator
 #import "Templates_copy_to_delete/Util.typ": file_folder, import_csv_filter_categories, insert_code-snippet, insert_figure, to_string, todo, transpose
 
 #show: document => set_config(
@@ -190,7 +190,7 @@ En relançant le scan, on obtient un écran satisfaisant sans vulnérabilité Hi
 
 ==== Problèmes détectés
 
-#insert_figure("Toujours plus de vulnérabilités dans un si petit script")
+#insert_figure("Toujours plus de vulnérabilités dans un si petit script", width: 70%)
 
 ==== Corrections
 
@@ -251,7 +251,7 @@ Mais c'était un peu trop long à setup dans l'interface en ligne, alors on a eu
 
 ==== Problèmes détectés
 
-#insert_figure("Vulnérabilités trouvées dans le dossier 3")
+#insert_figure("Vulnérabilités trouvées dans le dossier 3", width: 70%)
 
 ==== Corrections
 
@@ -262,5 +262,32 @@ Pour `direct-response-write`, on peut sanitiser avec ```js const xss = require("
 Pour `taint-unsafe-echo-tag`, on peut utiliser `htmlentities` ou `htmlspecialchars` de PHP pour sanitiser.
 Le seul endroit où ça ne fonctionnerait pas, ce serait si le php était invoqué dans un contexte ```html <script> </script>``` dans lequel on pourrait appeler des fonctions et ainsi invoquer du code sans avoir besoin de charactères tels que `"`, `'`, `<`, `>`, etc. Mais là ce n'est que du php donc ça va, `htmlentities` fera l'affaire.
 
-#insert_figure("Alerts gone..")
+#insert_figure("Alerts gone..", width: 25%)
 
+#pagebreak()
+
+=== Dossier #file_folder("4/")
+
+```bash cd ../4 && semgrep ci```
+
+==== Problèmes détectés
+
+#insert_figure("Vulnérabilités sur le répertoire 4", width: 60%)
+
+==== Corrections
+
+Il faut éviter de redigirer vers un domaine géré par l'input, donc préfixer par un domaine de confiance.
+Dans notre cas, nous ne savons pas quel domaine mettre pour cette appli', donc nous allons mettre example.com, dans #file_folder("koa.js").
+Pour la redirection dans #file_folder("aa.js"), on peut renvoyer une page pour demander à l'utilisateur s'il veut bien être redirigé vers une autre page (Cf #file_folder("aa.js")).
+
+Ça a introduit une vulnérabilité low (javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag) mais on va dire qu'on va l'ignorer car on a déjà sanitisé l'input.
+
+#insert_figure("Après quelques essais-erreurs, on arrive à une correction satisfaisante")
+
+#linebreak()
+#line_separator
+#linebreak()
+
+#insert_figure("Récapitulatif des corrections", width: 60%)
+
+#pagebreak()

@@ -5,7 +5,7 @@ const app = new Koa();
 
 app.use(async ctx => {
 	var url = ctx.query.target;
-	ctx.redirect(url); 
+	ctx.redirect('http://example.com/' + url);
 });
 
 app.listen(3000);
