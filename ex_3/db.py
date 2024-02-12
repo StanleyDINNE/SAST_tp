@@ -15,8 +15,7 @@ def db_init():
     c.execute("DROP TABLE users")
     c.execute("CREATE TABLE users (user text, password text, failures int)")
 
-    for u,p in users:
-        c.execute("INSERT INTO users (user, password, failures) VALUES ('%s', '%s', '%d')" %(u, p, 0))
+    c.executemany("INSERT INTO users (user, password, failures) VALUES (?, ?, '0')", users)
 
     conn.commit()
     conn.close()
@@ -24,4 +23,3 @@ def db_init():
 
 if __name__ == '__main__':
     db_init()
-

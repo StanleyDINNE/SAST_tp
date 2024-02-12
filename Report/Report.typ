@@ -101,7 +101,8 @@ semgrep --version # 1.60.1
 ```bash semgrep scan --config auto``` avait donné "_```text Missed out on 656 pro rules since you aren't logged in!```_", donc nous nous sommes résolus à nous créer un compte et nous connecter avec\ ```bash semgrep login```. // 💎
 
 Suite au login depuis le terminal :
-+ Liaison avec _GitHub_ #insert_figure("Liaison de Semgrep avec GitHub", width: 60%)
+#insert_figure("Liaison de Semgrep avec GitHub", width: 40%)
++ Liaison avec _GitHub_
 + Création d'une organisation "`security_3.0_static_analysis`"
 + Token de connexion est renvoyé dans le terminal
 
@@ -280,7 +281,7 @@ Il faut éviter de redigirer vers un domaine géré par l'input, donc préfixer 
 Dans notre cas, nous ne savons pas quel domaine mettre pour cette appli', donc nous allons mettre example.com, dans #file_folder("koa.js").
 Pour la redirection dans #file_folder("aa.js"), on peut renvoyer une page pour demander à l'utilisateur s'il veut bien être redirigé vers une autre page (Cf #file_folder("aa.js")).
 
-Ça a introduit une vulnérabilité low (javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag) mais on va dire qu'on va l'ignorer car on a déjà sanitisé l'input.
+Ça a introduit une vulnérabilité medium (javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag) mais avec une faible confiance donc on va dire qu'on va l'ignorer car on a déjà sanitisé l'input.
 
 #insert_figure("Après quelques essais-erreurs, on arrive à une correction satisfaisante")
 
@@ -289,5 +290,108 @@ Pour la redirection dans #file_folder("aa.js"), on peut renvoyer une page pour d
 #linebreak()
 
 #insert_figure("Récapitulatif des corrections", width: 60%)
+
+#pagebreak()
+
+== Audit d'une application complète avec SEMGREP
+
+=== Réinstalltion dans un environnement propre
+
+On réinstalle juste Semgrep dans un autre Virtual Environment pour avoir une installation propre (même si on aurait pu réutiliser celle de #file_folder("ex_2/")).
+
+#insert_code-snippet(title: "Réinstallation de semgrep dans un environnement clean pour l'exercice 3")[```bash
+deactivate && cd ../../ex_3 && python3 -m venv .venv && source ./.venv/bin/activate
+python3 -m pip install pyotp flask qrcode # Utilisés à plusieurs endroits, mais tous les trois en même temps dans "mod_mfa.py"
+python3 -m pip install semgrep
+python3 -m pip freeze > requirements.txt
+```]
+
+`$ ````bash semgrep ci```
+
+#insert_figure("Uh oh...", width: 40%, border: false)
+
+#insert_figure("Extrait des vulnérabilités (HIgh) trouvées dans ex_3", width: 60%)
+
+
+Dans un à plusieurs fichiers pour chacune, on a
+
+#[
+	#show text: t => align(left)[#t]
+	#show enum: e => align(left)[#e]
+
+	#let vulns = (
+		high: (`sqlalchemy-execute-raw-query`, `avoid_hardcoded_config_SECRET_KEY`),
+		medium: (`django-no-csrf-token`, `formatted-sql-query`, `avoid_using_app_run_directly`, `debug-enabled`, `missing-integrity`),
+		low: (`request-with-http`,)
+	)
+
+	#align(center, table(columns: 3,
+		..([Sévérité],	[Nombre de vulnérabilités],	[Vulnérabilités]						),
+		..([HIGH],		[#vulns.high.len()],		vulns.high.map(v => [+ #v])		.join[]	),
+		..([MEDIUM],	[#vulns.medium.len()],		vulns.medium.map(v => [+ #v])	.join[]	),
+		..([LOW],		[#vulns.low.len()],			vulns.low.map(v => [+ #v])		.join[]	),
+	))
+]
+
+=== Analyse et correction des problèmes trouvés
+
++ `avoid_hardcoded_config_SECRET_KEY` nécessite que l'on n'hardcode pas les secret dans l'application, ni même dans un fichier d'envionnement visible dans le dépôt GitHub. Les secrets doivent être dans des variables d'environnement, seulement en local.
+	Ainsi, on peut faire les modifications nécessaires dans les fichiers #file_folder("vulpy*.py") : ```python
+import os
+...
+app.config['SECRET_KEY'] = os.environ['VULPY_SECRET_KEY']
+```
+	Si on utilise `bash` par exemple, il faudrait définir ```bash export VULPY_SECRET_KEY='aaaaaaa'``` dans #file_folder("~/.bashrc").
+
++ `sqlalchemy-execute-raw-query` nécessite que l'on sanitize les input utilisateur qui pourraient entrer dans une query SQL, pour éviter les risques de SQL injections, comme les bases de données sont des éléments critiques. Selon #link("https://stackoverflow.com/a/14372802")[ce commentaire sur le sujet des SQL injections sur Stack Overflow].
+	Ainsi, on modifie les fichiers #file_folder("db.py"),  #file_folder("db_init.py")  en utilisant des requêtes préparées / paramétrées, notamment en remplaçant ```python for ...: Connection.execute``` par ```python Connection.executemany``` pour les deux premiers fichiers, et par exemple ```python c.execute("UPDATE users SET password = ? WHERE username = ?", (password, username))``` pour une des lignes du troisième.
+
++ `django-no-csrf-token` indique que la méthode de django pour éviter les CSRF n'a pas été utilisée. On peur s'aider de #link("https://docs.djangoproject.com/en/4.2/howto/csrf/")[la documentation sur leur site à ce sujet], pour ainsi corriger les problèmes dans les fichiers dans #file_folder("templates/") que sont
+	#file_folder("mfa.enable.html"),
+	#file_folder("posts.view.html"),
+	#file_folder("user.chpasswd.html"),
+	#file_folder("user.create.html"),
+	#file_folder("user.login.html"),
+	#file_folder("user.login.mfa.html") et
+	#file_folder("welcome.html").
+	En somme, tous les fichiers utilisant un ```html <form method="POST">...</form>``` à remplacer avec ```html <form method="POST">{% csrf_token %} ...</form>```.
+	#insert_figure("Conseil de la doc de django sur les CSRF")
+
+	#linebreak()
+
+	#insert_figure("Point sur la progression sur la correction des problèmes détectés", width: 70%)
+
+	#(linebreak()*2)
+	#line_separator
+	#(linebreak()*2)
+
+
+
++ `missing-integrity` dans le fichier #file_folder("templates/csp.html") est soulevée par Semgrep car il faudrait ajouter un paramètre `integrity` avec le hash du script à importer dans la balise ```html <script/>```.
+	Pour cela, je commence par télécharger le script en local en allant à l'URL, (ici https://apis.google.com/js/platform.js), je le hash avec ```bash sha256sum``` en local et je modifie la balise ainsi : ```html <script ...
+integrity="sha256-0bcb6531cb0967359e17b655d4142b55d1eac2aed3fe5340f8ce930a7000e5d3">
+</script>``` (on aurait aussi pu utiliser ```bash openssl sha256 platform.js``` pour donner un équivalent à ```sha256sum platform.js```).
+
+
++ `avoid_using_app_run_directly` (pour les fichiers #file_folder("vulpy-ssl.py") et #file_folder("vulpy.py")), problème de Broken Access Control, pour lequel il faut mettre les appels à ```python app.run()``` derrière "une garde" (comme une fonction, ou un ```python if __name__ == '__name__': ...```).
+	Nous avons décidé d'utiliser ```python if __name__ == '__name__': ...```, comme c'est une best-practice en Python, qui permet notamment d'indiquer que le fichier est un script exécutable et non juste une librairie.
+
+
++ `debug-enabled`, toujours avec les deux même fichiers #file_folder("vulpy-ssl.py") et #file_folder("vulpy.py"), indique que ```python debug=True``` en tant que paramètre de ```python app.run``` est problématique : si l'app' est lancée en production avec cette configuration, des info' sensibles peuvent potentiellement leak dans les logs.
+	Il vaut mieux préférer set cette valeur avec des variables d'environnement, en la définissant par défaut à ```python False``` si non définie. Par exemple avec ```python
+DEBUG = (_.lower() == 'true') if (_ := os.environ.get("VULPY_DEBUG", None)) is not None else False
+app.run(..., debug = DEBUG, ...)
+```
+	En fait, ```python os.environ``` va load les variables d'environnement en tant que string par défaut, et toute string non vide est considérée comme True.
+	On va donc utiliser cette expression ternaire créée de toute pièce va vérifier que la variable d'environnement est bien définie à `'true'`, ou `'True'`, etc.
+		- Si oui, on vérifie que sa version minuscule correspond bien à ```python 'true'```, auquel cas on renvoit ```python True```
+		- Si non, on renvoie simplement ```python False```, la valeur par défaut.
+	Nous avions déjà importé ```python os``` lors du patch sur les secrets précédemment, donc pas besoin de le réimporter.
+	Évidemment, il faut aussi définir la variable d'environnement (comme pour les secrets avant) en local.
+
++ La dernière `request-with-http` trouvée dans les fichiers #file_folder("api_list.py") et #file_folder("api_post.py") est explicite d'elle-même. Le problème pour la corriger est que si on fait un appel à un site qui ne supporte pas `HTTPS` mais juste `HTTP`, on ne peut pas faire grand chose de plus (à notre connaissance). Là c'est une requête vers la loopback (`127.0.0.1`) donc on peut mettre https si on setup correctement en local avec les certificats, et tout.
+On va modifier en supposant que les admin' de la machine du serveur auraient fait les bonnes config' et générations de certificats.
+
+#insert_figure("Toutes les vulnérabilités trouvées par Semgrep ont été corrigées", width: 25%)
 
 #pagebreak()

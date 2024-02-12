@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
+import os
 
 from flask import Flask, g, redirect, request
 
@@ -13,7 +14,7 @@ from mod_posts import mod_posts
 from mod_user import mod_user
 
 app = Flask('vulpy')
-app.config['SECRET_KEY'] = 'aaaaaaa'
+app.config['SECRET_KEY'] = os.environ['VULPY_SECRET_KEY']
 
 app.register_blueprint(mod_hello, url_prefix='/hello')
 app.register_blueprint(mod_user, url_prefix='/user')
@@ -52,4 +53,6 @@ def add_csp_headers(response):
     return response
 
 
-app.run(debug=True, host='127.0.1.1', port=5000, extra_files='csp.txt')
+if __name__ == '__main__':
+    DEBUG = (_.lower() == 'true') if (_ := os.environ.get("VULPY_DEBUG", None)) is not None else False
+    app.run(debug = DEBUG, host='127.0.1.1', port=5000, extra_files='csp.txt')

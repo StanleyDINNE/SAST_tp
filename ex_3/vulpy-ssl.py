@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from flask import Flask, g, redirect, request
+import os
 
 from mod_hello import mod_hello
 from mod_user import mod_user
@@ -10,7 +11,7 @@ from mod_mfa import mod_mfa
 import libsession
 
 app = Flask('vulpy')
-app.config['SECRET_KEY'] = 'aaaaaaa'
+app.config['SECRET_KEY'] = os.environ['VULPY_SECRET_KEY']
 
 app.register_blueprint(mod_hello, url_prefix='/hello')
 app.register_blueprint(mod_user, url_prefix='/user')
@@ -26,4 +27,6 @@ def do_home():
 def before_request():
     g.session = libsession.load(request)
 
-app.run(debug=True, host='127.0.1.1', ssl_context=('/tmp/acme.cert', '/tmp/acme.key'))
+if __name__ == '__main__':
+    DEBUG = (_.lower() == 'true') if (_ := os.environ.get("VULPY_DEBUG", None)) is not None else False
+    app.run(debug = DEBUG, host='127.0.1.1', ssl_context=('/tmp/acme.cert', '/tmp/acme.key'))
