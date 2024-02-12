@@ -333,7 +333,7 @@ Dans un à plusieurs fichiers pour chacune, on a
 	))
 ]
 
-=== Analyse et correction des problèmes trouvés
+=== Analyse et correction des problèmes trouvés <vulns_app_complete_semgrep>
 
 + `avoid_hardcoded_config_SECRET_KEY` nécessite que l'on n'hardcode pas les secret dans l'application, ni même dans un fichier d'envionnement visible dans le dépôt GitHub. Les secrets doivent être dans des variables d'environnement, seulement en local.
 	Ainsi, on peut faire les modifications nécessaires dans les fichiers #file_folder("vulpy*.py") : ```python
@@ -395,3 +395,52 @@ On va modifier en supposant que les admin' de la machine du serveur auraient fai
 #insert_figure("Toutes les vulnérabilités trouvées par Semgrep ont été corrigées", width: 25%)
 
 #pagebreak()
+
+
+== Création d'application avec vulnérabilité non détectée par SEMGREP
+
+```bash
+cd ../ex_4/
+```
+
+=== Premières idées <premières_idées>
+
+La première idée que nous avons eu était de berner Semgrep. C'est-à-dire écrire du code vulnérable, mais en le camouflant, afin qu'une analyse statique avec des patterns ne puisse pas la détecter.
+
+Un exemple tout bête : si une règle détecte l'usage de la fonction d'exécution de code sous forme de string dans Pythnon ```python exec```, il suffit de l'invoquer sans utiliser son nom.
+On peut la récupérer du dictionnaire des variables globales et l'appeler :
+#insert_code-snippet(title: [Exemple simple d'un appel à ```python exec(...)``` non détecté par un SAST])[```python
+getattr(
+	globals()['__builtins__'],
+	'e' + 'xQc'.replace('Q', 'e')
+)('''
+arbitrary = lambda: print("Exécution de code issu d'une string")
+arbitrary()
+''')
+```]
+On a passé le modules des builtins présent dans l'environnement global dans la fonction `getattr` qui va récupérer la fonction associée `'exec'` (string obfusquée aux regard des SAST) puis passer le paramètre qui est le code à exécuter, sous forme de string (qui peut venir un input non sanitisé).
+
+
+=== Application vulnérable
+
+Nous avons utilisé #link("https://www.zaproxy.org/")[Zap] comme DAST et nous nous sommes inspirés du #link("https://github.com/AchrafEL-BACH/SAST_Lab/blob/main/ex_4/vuln.py")[code d'Achraf & Sarah] : les fichiers de l'application _Flask_ sont dans #file_folder("ex_4/"), que l'on lance simplement avec ```bash python3 vulnerable.py```.
+
+
+Même en sanitisant l'input, Semgrep trouve toujours à tord qu'il y a une vulnérabilité `directly-returned-format-string`, de sévérité medium.
+Par contre, ce qu'il ne voit pas et que Zap voit (Cf @zap), c'est l'absence de token pour prévenir les CSRF.
+
+#insert_figure("Zap trouve l'absence de token CSRF", width: 70%) <zap>
+
+#insert_figure("Semgrep donne des faux positifs, et met en faux négatif le CSRF", width: 60%)
+
+Le problème ici n'est pas que Semgrep n'est pas capable de détecter l'absence de ce token, puisqu'il l'a fait pour `django-no-csrf-token` dans le @vulns_app_complete_semgrep, mais plutôt comment Semgrep fonctionne.
+De ce que nous avons compris, il utilise un ensemble de fichiers de règles pour trouver des patterns, et à l'aide notamment de logique de source et sink, il va pouvoir déterminer si tel morceau de code correspond à un pattern (ils essayent d'être exhaustifs) de vulnérabilité connu.
+
+Sauf que là, la vulnérabilité et dans une string renvoyée, qui n'est pas vérifiée par Semgrep.
+Et on voit même que, pour une vulnérabilité différente (`directly-returned-format-string`), Semgrep va toujours s'alarmer alors que l'input est sanitisé.
+
+Pour les deux cas, il faudrait lui rajouter des règles, d'une part pour vérifier plus de choses, d'autres part, pour ajouter des sanitizers.
+
+=== Conclusion
+
+Cela n'était qu'un exemple, mais on peut aussi avoir des config' qui ne sont pas vérifiées par un SAST, ou alors des obfuscations qui sortent des patterns comme l'exemple théorique dans le @premières_idées.
