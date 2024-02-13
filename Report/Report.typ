@@ -13,6 +13,9 @@
 )[#document]
 
 #linebreak()
+#align(center)[Le code #link("https://github.com/StanleyDINNE/SAST_tp")[StanleyDINNE/SAST_tp] est sur GitHub.]
+
+#linebreak()
 #outline(title: "Sommaire", indent: 1em, depth: 4) <table_of_contents>
 #pagebreak()
 
